@@ -1,0 +1,57 @@
+name: panda-gadget-thymythos
+version: 2017.01
+summary: Pandaboard support package
+description: |
+ Support files for booting Pandaboard
+type: gadget
+architectures: [armhf]
+confinement: strict
+grade: stable
+parts:
+  uboot:
+    plugin: make
+    source: git://git.denx.de/u-boot.git
+    source-branch: v2017.01
+    source-depth: 1
+    artifacts: [MLO, u-boot.img]
+    prepare: |
+      sed '44 a #define CONFIG_SYS_REDUNDAND_ENVIRONMENT' -i include/configs/omap4_panda.h
+      make omap4_panda_defconfig
+    build: |
+      if [ "$(arch)" = "x86_64" ]; then
+        if [ ! -x /usr/bin/arm-linux-gnueabihf-gcc ]; then
+          echo "ERROR: You are cross building this snap, please install gcc-arm-linux-gnueabihf"
+          exit 1
+        fi
+        CROSS_COMPILE=arm-linux-gnueabihf- make -j4
+      else
+        make -j4
+      fi
+    install: |
+      cp MLO u-boot.img $SNAPCRAFT_PART_INSTALL/
+      tools/mkenvimage -r -s 131072 -o $SNAPCRAFT_PART_INSTALL/uboot.env ../../../uboot.env.in
+      ln -s uboot.env $SNAPCRAFT_PART_INSTALL/uboot.conf
+    build-packages:
+      - bc
+      - build-essential
+      - libpython2.7-dev
+
+slots:
+  gpio-20:
+    interface: gpio
+    number: 20
+  i2c-3:
+    interface: i2c
+    path: /dev/i2c-3
+  bt-serial:
+    interface: serial-port
+    path: /dev/ttyO1
+  ext-serial:
+    interface: serial-port
+    path: /dev/ttyO3
+  spidev0.0:
+     interface: spi
+     path: /dev/spidev0.0
+  spidev0.1:
+     interface: spi
+     path: /dev/spidev0.1
