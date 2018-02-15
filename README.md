@@ -1,5 +1,7 @@
 # Pandaboard Gadget Snap
 
+[![Snap Status](https://build.snapcraft.io/badge/ThyMYthOS/panda-gadget.svg)](https://build.snapcraft.io/user/ThyMYthOS/panda-gadget)
+
 This repository contains the source for an Ubuntu Core gadget snap for the Pandaboard.
 
 Building it with snapcraft will automatically pull, configure, patch and build
