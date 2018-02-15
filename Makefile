@@ -1,5 +1,5 @@
 all:
-	snapcraft
+	snapcraft --target-arch armhf
 
 clean:
 	snapcraft clean

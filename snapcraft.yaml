@@ -9,24 +9,15 @@ confinement: strict
 grade: stable
 parts:
   uboot:
-    plugin: make
+    plugin: kbuild
     source: git://git.denx.de/u-boot.git
-    source-branch: v2017.01
+    source-tag: v2017.01
     source-depth: 1
-    artifacts: [MLO, u-boot.img]
+    kdefconfig: [omap4_panda_defconfig]
+    build-attributes:
+      - no-install
     prepare: |
       sed '44 a #define CONFIG_SYS_REDUNDAND_ENVIRONMENT' -i include/configs/omap4_panda.h
-      make omap4_panda_defconfig
-    build: |
-      if [ "$(arch)" = "x86_64" ]; then
-        if [ ! -x /usr/bin/arm-linux-gnueabihf-gcc ]; then
-          echo "ERROR: You are cross building this snap, please install gcc-arm-linux-gnueabihf"
-          exit 1
-        fi
-        CROSS_COMPILE=arm-linux-gnueabihf- make -j4
-      else
-        make -j4
-      fi
     install: |
       cp MLO u-boot.img $SNAPCRAFT_PART_INSTALL/
       tools/mkenvimage -r -s 131072 -o $SNAPCRAFT_PART_INSTALL/uboot.env ../../../uboot.env.in
